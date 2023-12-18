@@ -1,0 +1,12 @@
+[package]
+name = "rust_vehsim"
+version = "0.1.0"
+edition = "2021"
+
+[[example]]
+name = "plot_tyre_data"
+
+[dependencies]
+
+[dev-dependencies]
+plotters = "0.3.5"
