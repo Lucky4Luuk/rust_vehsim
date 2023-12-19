@@ -35,14 +35,14 @@ fn plot<F: Fn(f32) -> f32, I: Iterator<Item = f32>>(f: F, i: I, range_x: (f32, f
 
 fn main() {
     let td = TyreData {
-        no_load_coeff: 1.0,
-        full_load_coeff: 0.5,
-        load_sensitivity: 1.0,
+        no_load_coeff: 2.08,
+        full_load_coeff: 0.7,
+        load_sensitivity: 0.00023,
 
         static_friction_coeff: 1.0,
-        sliding_friction_coeff: 0.5,
-        stribeck_velocity: 2.0,
-        stribeck_exponent: 1.9,
+        sliding_friction_coeff: 1.0,
+        stribeck_velocity: 1.0,
+        stribeck_exponent: 2.0,
     };
 
     plot(|load| td.calculate_friction_coeff(0.0, load), (0..8000).into_iter().map(|i| i as f32), (0.0, 8000.0), (0.0, 2.0), "load").expect("Failed to plot!");

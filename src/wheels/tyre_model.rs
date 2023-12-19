@@ -28,7 +28,6 @@ impl TyreData {
     /// load:           N
     // TODO: This function needs more investigations. This is almost certainly a bit wrong.
     pub fn calculate_friction_coeff(&self, sliding_vel: f32, load: f32) -> f32 {
-        let load = load / 1_000f32;
         let coeff_a = friction_coeff_while_sliding(
             self.static_friction_coeff,
             self.sliding_friction_coeff,
@@ -47,8 +46,9 @@ impl TyreData {
 }
 
 /// sliding_vel:    m/s
-fn friction_coeff_while_sliding(static_friction_coeff: f32, sliding_friction_coeff: f32, stribeck_velocity: f32, stribeck_exponent: f32, sliding_vel: f32) -> f32 {
-    let t = (sliding_vel / stribeck_velocity).powf(stribeck_exponent);
+// TODO: Does not support the stribeck exponent yet!
+fn friction_coeff_while_sliding(static_friction_coeff: f32, sliding_friction_coeff: f32, stribeck_velocity: f32, _stribeck_exponent: f32, sliding_vel: f32) -> f32 {
+    let t = sliding_vel / stribeck_velocity;
     lerp(static_friction_coeff, sliding_friction_coeff, t.min(1.0))
 }
 
@@ -56,7 +56,7 @@ fn friction_coeff_while_sliding(static_friction_coeff: f32, sliding_friction_coe
 // TODO: This function needs more investigation. I'm not sure if this is accurate to how BeamNG.Drive implements it.
 //       With some reference data, it should be fairly easy to figure out how load_sensitivity needs to be used.
 fn friction_coeff_under_load(no_load_coeff: f32, full_load_coeff: f32, load_sensitivity: f32, load: f32) -> f32 {
-    let t = (load / load_sensitivity).min(1.0);
+    let t = (load * load_sensitivity).min(1.0);
     lerp(no_load_coeff, full_load_coeff, t)
 }
 
