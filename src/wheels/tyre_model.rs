@@ -5,6 +5,7 @@
 // reference data available already, and it does
 // fairly well for now.
 
+#[derive(Debug, Copy, Clone)]
 pub struct TyreData {
     /// Friction coefficient under no load
     pub no_load_coeff: f32,

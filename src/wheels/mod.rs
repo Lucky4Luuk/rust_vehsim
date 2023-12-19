@@ -3,29 +3,30 @@
 
 pub mod tyre_model;
 
+#[derive(Debug, Copy, Clone)]
 pub struct Wheel {
     /// Tyre data
-    tyre: tyre_model::TyreData,
+    pub tyre: tyre_model::TyreData,
     /// Determines the wheel direction, to differentiate between left and right wheels
-    direction: f32,
+    pub direction: f32,
     /// The radius of the wheel, including tyre
-    radius: f32,
+    pub radius: f32,
     /// The mass of the wheel, including tyre, in kg
-    mass: f32,
+    pub mass: f32,
 
     /// Deflated, does not imply broken!
-    deflated: bool,
+    pub deflated: bool,
     /// Whether the wheel is still attached to its halfshaft
-    broken: bool,
+    pub broken: bool,
 
     /// Updated whenever calc_wheel_accel_torque is called
-    last_slip: f32,
+    pub last_slip: f32,
 
-    last_angular_vel: f32,
+    pub last_angular_vel: f32,
 
-    angular_vel: f32,
+    pub angular_vel: f32,
 
-    wheel_speed: f32,
+    pub wheel_speed: f32,
 }
 
 impl Wheel {
@@ -37,10 +38,11 @@ impl Wheel {
         // let parking_brake_input = parking_brake_input.min(1.0);
 
         let accel_torque = self.calc_wheel_accel_torque(vehicle_speed, torque_in);
+        println!("accel / in: {} / {}", accel_torque, torque_in);
         // TODO: Brake torque? Seems like we can just calculate the brake torque and add it to this
         let total_torque = accel_torque;
 
-        self.update_wheel_velocity(delta_s, total_torque);
+        self.update_wheel_velocity(delta_s, torque_in);
 
         total_torque
     }
@@ -56,7 +58,7 @@ impl Wheel {
 
         // We introduce a tiny minimum speed to prevent division by zero
         // Same for the angular velocity
-        const EPSILON: f32 = 0.0001;
+        const EPSILON: f32 = 0.01;
         let slip_ratio = (self.last_angular_vel.abs() * self.radius).min(EPSILON) / vehicle_speed.abs().max(EPSILON);
 
         self.last_slip = slip_ratio;
