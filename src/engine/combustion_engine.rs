@@ -1,4 +1,5 @@
 pub struct CombustionEngine {
+    /// Torque curve, specified as (rpm, torque (N))
     pub torque_curve: Vec<(f32, f32)>,
     pub idle_rpm: f32,
     pub max_rpm: f32,
@@ -60,9 +61,13 @@ impl CombustionEngine {
         let throttle_input = throttle_input.max(0.0).min(1.0);
 
         let (torque, friction_torque) = self.calc_torque(throttle_input);
-        let reaction_torque = child.update(delta_s, vehicle_speed, torque);
-        let final_torque = torque - friction_torque - reaction_torque;
+        let angular_vel = child.update(delta_s, vehicle_speed, torque - friction_torque);
 
+        self.current_rpm = angular_vel.max(self.idle_rpm).min(self.max_rpm);
 
+        // let final_torque = torque - friction_torque - reaction_torque;
+        // let angular_accel = final_torque / self.inertia;
+        // self.current_rpm += angular_accel * delta_s;
+        // self.current_rpm = self.current_rpm.min(self.max_rpm).max(self.idle_rpm);
     }
 }

@@ -30,7 +30,7 @@ pub struct Wheel {
 }
 
 impl Wheel {
-    /// Returns the reaction torque
+    /// Returns the angular velocity of the wheel
     pub fn update(&mut self, delta_s: f32, vehicle_speed: f32, torque_in: f32) -> f32 {
         if self.broken { return 0.0; } // Return early if the wheel is broken
 
@@ -38,16 +38,16 @@ impl Wheel {
         // let parking_brake_input = parking_brake_input.min(1.0);
 
         let accel_torque = self.calc_wheel_accel_torque(vehicle_speed, torque_in);
-        println!("accel / in: {} / {}", accel_torque, torque_in);
         // TODO: Brake torque? Seems like we can just calculate the brake torque and add it to this
-        let total_torque = accel_torque;
+        let total_torque = (torque_in - accel_torque).max(0.0);
 
-        self.update_wheel_velocity(delta_s, torque_in);
+        self.update_wheel_velocity(delta_s, total_torque);
 
-        total_torque
+        self.angular_vel
     }
 
-    // TODO: Incorporate tyre model
+    // TODO: Use the friction coefficients calculated somehow?
+    // TODO: Incorporate tyre model into friction coefficient calculations
     // TODO: Incorporate ground model friction coefficient
     // TODO: I think vehicle speed needs to be the individual wheel speed here.
     //       This should be good enough for testing, but it's not correct!

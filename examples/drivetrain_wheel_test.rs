@@ -41,28 +41,28 @@ fn main() {
 
     let root = BitMapBackend::new("plot_drivetrain_wheel_slip.png", (640, 480)).into_drawing_area();
     root.fill(&WHITE).unwrap();
+
     let mut chart = ChartBuilder::on(&root)
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
-        .build_cartesian_2d(0f32..test_length_s, 0f32..5.0f32).unwrap();
+        .right_y_label_area_size(30)
+        .build_cartesian_2d(0f32..test_length_s, 0f32..2.0f32).unwrap()
+        .set_secondary_coord(0f32..test_length_s, 0f32..1000.0f32);
 
-    chart.configure_mesh().draw().unwrap();
+    chart
+        .configure_mesh()
+        .disable_x_mesh()
+        .disable_y_mesh()
+        .y_desc("Slip ratio (0-1)")
+        .draw()
+        .unwrap();
 
-    // for i in 0..6 {
-    //     let throttle = i as f32 / 5f32;
-    //     chart
-    //         .draw_series(LineSeries::new(
-    //             (1100..5750).map(|rpm| {
-    //                 engine.current_rpm = rpm as f32;
-    //                 let (torque, friction_torque) = engine.calc_torque(throttle);
-    //                 (rpm, (torque - friction_torque) as i32)
-    //             }),
-    //             &RED,
-    //         )).unwrap()
-    //         .label("y = x^2")
-    //         .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
-    // }
+    chart
+        .configure_secondary_axes()
+        .y_desc("Wheel speed (m/s)")
+        .draw()
+        .unwrap();
 
     chart
         .draw_series(LineSeries::new(
@@ -71,6 +71,14 @@ fn main() {
         )).unwrap()
         .label("wheel slip")
         .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+
+    chart
+        .draw_secondary_series(LineSeries::new(
+            (0..(data_wheel_speed.len() as isize)).map(|i| data_wheel_speed[i as usize]),
+            &BLUE,
+        )).unwrap()
+        .label("wheel speed")
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &BLUE));
 
     chart
         .configure_series_labels()

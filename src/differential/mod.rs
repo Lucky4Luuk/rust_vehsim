@@ -6,7 +6,7 @@ pub enum Differential {
 }
 
 impl Differential {
-    /// Returns the reaction torque produced by its children
+    /// Returns the angular velocity of its children
     pub fn update(&mut self, delta_s: f32, vehicle_speed: f32, torque_in: f32) -> f32 {
         match self {
             Self::WheelConnector(wheel) => wheel.update(delta_s, vehicle_speed, torque_in),
