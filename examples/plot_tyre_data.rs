@@ -43,8 +43,13 @@ fn main() {
         sliding_friction_coeff: 1.0,
         stribeck_velocity: 1.0,
         stribeck_exponent: 2.0,
+
+        tyre_steepness: 22.0,
+        tyre_amplitude: 3220.0,
+        tyre_falloff: 2700.0,
     };
 
     plot(|load| td.calculate_friction_coeff(0.0, load), (0..8000).into_iter().map(|i| i as f32), (0.0, 8000.0), (0.0, 2.0), "load").expect("Failed to plot!");
     plot(|sliding| td.calculate_friction_coeff(sliding, 0.0), (0..250).into_iter().map(|i| (i as f32) / 10f32), (0.0, 25.0), (0.0, 2.0), "sliding").expect("Failed to plot!");
+    plot(|slip_ratio| td.calculate_accel_force(slip_ratio), (-200..200).into_iter().map(|i| (i as f32) / 100f32), (-2.0, 2.0), (-5000.0, 5000.0), "slip_ratio").expect("Failed to plot!");
 }

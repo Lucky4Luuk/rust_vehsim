@@ -21,6 +21,10 @@ pub struct TyreData {
     pub stribeck_velocity: f32,
     /// Affects the smoothing of the stribeck curve
     pub stribeck_exponent: f32,
+
+    pub tyre_steepness: f32,
+    pub tyre_amplitude: f32,
+    pub tyre_falloff: f32,
 }
 
 impl TyreData {
@@ -42,6 +46,16 @@ impl TyreData {
             load
         );
         coeff_a * coeff_b
+    }
+
+    pub fn calculate_accel_force(&self, slip_ratio: f32) -> f32 {
+        let sign = slip_ratio.is_sign_positive() as u8 as f32 * 2.0 - 1.0;
+        let slip_ratio = slip_ratio.abs().min(std::f32::consts::PI * 0.5);
+        let a = self.tyre_steepness;
+        let b = self.tyre_amplitude;
+        let c = self.tyre_falloff;
+        // arctan(slip_ratio * a) * b + a^-slip_ratio * c - c
+        ((slip_ratio * a).atan() * b + a.powf(-slip_ratio) * c - c) * sign
     }
 }
 

@@ -10,9 +10,9 @@ pub struct EngineContainer {
 }
 
 impl EngineContainer {
-    pub fn update(&mut self, delta_s: f32, throttle_input: f32) {
+    pub fn update(&mut self, delta_s: f32, vehicle_speed: f32, throttle_input: f32) {
         match &mut self.engine {
-            Engine::CombustionEngine(engine) => engine.update(delta_s, throttle_input, &mut self.child),
+            Engine::CombustionEngine(engine) => engine.update(delta_s, vehicle_speed, throttle_input, &mut self.child),
         }
     }
 }

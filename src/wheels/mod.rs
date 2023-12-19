@@ -30,13 +30,13 @@ pub struct Wheel {
 
 impl Wheel {
     /// Returns the reaction torque
-    pub fn update(&mut self, delta_s: f32, torque_in: f32) -> f32 {
+    pub fn update(&mut self, delta_s: f32, vehicle_speed: f32, torque_in: f32) -> f32 {
         if self.broken { return 0.0; } // Return early if the wheel is broken
 
         // let brake_input = brake_input.min(1.0);
         // let parking_brake_input = parking_brake_input.min(1.0);
 
-        let accel_torque = self.calc_wheel_accel_torque(torque_in);
+        let accel_torque = self.calc_wheel_accel_torque(vehicle_speed, torque_in);
         // TODO: Brake torque? Seems like we can just calculate the brake torque and add it to this
         let total_torque = accel_torque;
 
@@ -47,13 +47,21 @@ impl Wheel {
 
     // TODO: Incorporate tyre model
     // TODO: Incorporate ground model friction coefficient
-    // TODO: This seems very wrong?
-    fn calc_wheel_accel_torque(&mut self, torque_in: f32) -> f32 {
+    // TODO: I think vehicle speed needs to be the individual wheel speed here.
+    //       This should be good enough for testing, but it's not correct!
+    fn calc_wheel_accel_torque(&mut self, vehicle_speed: f32, torque_in: f32) -> f32 {
         let tyre_friction_coefficient = 0.9; // TODO: This should be calculated using the tyre model
         let ground_mat_friction_coefficient = 1.0;
         let friction_coefficient = tyre_friction_coefficient * ground_mat_friction_coefficient;
-        self.last_slip = 1.0 - friction_coefficient;
-        torque_in * self.last_slip
+
+        // We introduce a tiny minimum speed to prevent division by zero
+        // Same for the angular velocity
+        const EPSILON: f32 = 0.0001;
+        let slip_ratio = (self.last_angular_vel.abs() * self.radius).min(EPSILON) / vehicle_speed.abs().max(EPSILON);
+
+        self.last_slip = slip_ratio;
+
+        self.tyre.calculate_accel_force(slip_ratio)
     }
 
     fn update_wheel_velocity(&mut self, delta_s: f32, torque: f32) {
