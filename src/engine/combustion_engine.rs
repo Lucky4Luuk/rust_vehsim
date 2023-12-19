@@ -56,8 +56,12 @@ impl CombustionEngine {
     }
 
     /// Updates the engine and returns the torque produced by the engine
-    pub fn update(&mut self, delta_s: f32, throttle_input: f32) {
+    pub fn update(&mut self, delta_s: f32, throttle_input: f32, child: &mut crate::differential::Differential) {
         let throttle_input = throttle_input.max(0.0).min(1.0);
+
+        let (torque, friction_torque) = self.calc_torque(throttle_input);
+        let reaction_torque = child.update(delta_s, torque);
+        let final_torque = torque - friction_torque - reaction_torque;
 
 
     }
